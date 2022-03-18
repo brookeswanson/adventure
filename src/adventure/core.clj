@@ -1,14 +1,14 @@
 (ns adventure.core
   (:require
+   [adventure.twilio :as twilio]
    [compojure.core :refer [GET POST defroutes]]
    [compojure.route :as route]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults api-defaults]]))
 
 (defn sms-handler
-  [{params :params :as request}]
-  (prn params)
+  [{:keys [params]}]
   {:status 200
-   :body ""
+   :body (twilio/respond ["meow"])
    :headers {"Content-Type" "application/xml"}})
 
 (defroutes app-routes

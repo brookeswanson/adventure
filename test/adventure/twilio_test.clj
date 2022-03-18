@@ -20,5 +20,3 @@
           response (twilio/respond str-messages)]
       (is (string/includes? response (first str-messages)))
       (is (string/includes? response (last str-messages))))))
-
-
