@@ -3,7 +3,7 @@
    (com.twilio.twiml MessagingResponse$Builder)
    (com.twilio.twiml.messaging Body$Builder
                                Message$Builder)))
-(defn str-message->sms
+(defn- str-message->sms
   "Given a string return a twilio Message Object with that string embedded."
   [str-message]
   (let [body (.build (Body$Builder. str-message))]
