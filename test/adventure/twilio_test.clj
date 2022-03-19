@@ -1,7 +1,6 @@
 (ns adventure.twilio-test
   (:require
    [clojure.string :as string]
-   [ring.mock.request :as mock]
    [clojure.test :refer [deftest testing is]]
    [adventure.twilio :as twilio]))
 
