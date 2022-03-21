@@ -2,26 +2,51 @@
   (:require
    [clojure.string :as string]
    [clojure.test :refer [deftest testing is]]
-   [adventure.engine :as engine]))
+   [adventure.engine :as engine]
+   [adventure.error :as error]))
 
 (deftest interesting-word?-test
   (testing "It filters out empty words"
-    (is (false? (engine/interesting-word? "")))
-    (is (false? (engine/interesting-word? nil))))
+    (is (false? (#'engine/interesting-word? "")))
+    (is (false? (#'engine/interesting-word? nil))))
 
   (testing "It filters out ignore list words"
-    (is (every? false? (mapv engine/interesting-word? engine/ignore-list)))))
+    (is (every? false? (mapv #'engine/interesting-word? engine/ignore-list)))))
 
-(deftest message->parsed-commands-test
-  (testing "An empty string returns nil"
-    (is (nil? (engine/message->parsed-commands "")))
-    (is (nil? (engine/message->parsed-commands nil))))
+(deftest word->command-test
+  (testing "Similar words result in the same command"
+    (is (= "look"
+           (#'engine/word->command "see")
+           (#'engine/word->command "look"))))
+  (testing "An unrecognized command results in an error identifier"
+    (is (= :unrecognized-command (#'engine/word->command "meow")))))
 
+(deftest word->command-map-test
+  (testing "The first word is translated into a command key"
+    (is (= "look"
+           (:command (#'engine/words->command-map ["see"]))))
+    (is (= :unrecognized-command
+           (:command (#'engine/words->command-map ["meow"])))))
+
+  (testing "The rest of the array gets put into the extras key"
+    (is (= ["testing"]
+           (:extras (#'engine/words->command-map ["hello" "testing"]))))
+    (is (nil? (:extras (#'engine/words->command-map ["meow"]))))))
+
+(deftest message->words-test
   (testing "A single not ignored word returns an array with itself"
-    (is (= ["meow"] (engine/message->parsed-commands "meow"))))
+    (is (= ["meow"] (#'engine/message->words "meow"))))
 
   (testing "Articles are filtered out"
-    (is (= ["go" "store"] (engine/message->parsed-commands "go to the store"))))
+    (is (= ["go" "store"] (#'engine/message->words "go to the store"))))
 
   (testing "Capitilization doesn't matter"
-    (is (= ["meow" "grape"] (engine/message->parsed-commands "MeOw to A gRaPE")))))
+    (is (= ["meow" "grape"] (#'engine/message->words "MeOw to A gRaPE")))))
+
+(deftest run-test
+  (testing "An empty message returns the help error message."
+    (is (= [(:help error/message)] (engine/run nil)))
+    (is (= [(:help error/message)] (engine/run ""))))
+
+  (testing "A message with a command in it returns a response string"
+    (is (= ["Meow"] (engine/run "testing new things")))))
