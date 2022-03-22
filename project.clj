@@ -9,7 +9,7 @@
                  [com.outpace/config "0.13.5"]
                  [com.twilio.sdk/twilio "8.27.1"]
                  [dev.weavejester/ragtime "0.9.1"]
-                 [org.clojure/clojure "1.10.3"]
+                 [org.clojure/clojure "1.11.0"]
                  [org.postgresql/postgresql "42.3.3"]
                  [ring/ring-defaults "0.3.3"]]
   :plugins [[lein-ring "0.12.5"]]
