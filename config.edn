@@ -1,0 +1,4 @@
+{
+  adventure.db.migrations/database-uri #config/env "DATABASE_URL"
+  adventure.db.game/database-url #config/env "DATABASE_URL"
+}
