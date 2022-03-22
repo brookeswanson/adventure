@@ -18,7 +18,7 @@
         result (engine/run {:game game
                             :message body})]
     ;; save game
-    (db/upsert! db/ds player-id (:game result))
+    (db/upsert! db/ds player-id result)
     ;; return string responses
     (:response result)))
 

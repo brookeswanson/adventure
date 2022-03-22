@@ -20,7 +20,9 @@
                 db/upsert! (fn [conn player-id game]
                             (assoc conn player-id {:game game}))]
     (testing "That the game is run"
-      (is (= (engine/run (get-in sms-request [:params :Body]))
+      (is (= (:response
+              (engine/run {:message (get-in sms-request [:params :Body])
+                           :game (:meow fake-db)}))
              (core/run-game (:params sms-request)))))))
 
 (deftest sms-handler-test

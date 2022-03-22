@@ -36,9 +36,8 @@
 
 (defn run [{:keys [game message]}]
   (if (string/blank? message)
-    {:game game
-     :response (:help error/message)}
+    (assoc game :response (:help error/message))
     (-> message
         message->words
         (words->command-map game)
-        ((constantly {:game game :response "Meow"})))))
+        ((constantly (assoc game :response "Meow"))))))
