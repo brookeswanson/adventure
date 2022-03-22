@@ -24,14 +24,14 @@
 (deftest word->command-map-test
   (testing "The first word is translated into a command key"
     (is (= "look"
-           (:command (#'engine/words->command-map ["see"]))))
+           (:command (#'engine/words->command-map ["see"] {}))))
     (is (= :unrecognized-command
-           (:command (#'engine/words->command-map ["meow"])))))
+           (:command (#'engine/words->command-map ["meow"] {})))))
 
   (testing "The rest of the array gets put into the extras key"
     (is (= ["testing"]
-           (:extras (#'engine/words->command-map ["hello" "testing"]))))
-    (is (nil? (:extras (#'engine/words->command-map ["meow"]))))))
+           (:extras (#'engine/words->command-map ["hello" "testing"] {}))))
+    (is (nil? (:extras (#'engine/words->command-map ["meow"] {}))))))
 
 (deftest message->words-test
   (testing "A single not ignored word returns an array with itself"
@@ -45,8 +45,12 @@
 
 (deftest run-test
   (testing "An empty message returns the help error message."
-    (is (= [(:help error/message)] (engine/run nil)))
-    (is (= [(:help error/message)] (engine/run ""))))
+    (is (= (:help error/message) (:response (engine/run nil))))
+    (is (= (:help error/message) (:response (engine/run "")))))
 
-  (testing "A message with a command in it returns a response string"
-    (is (= ["Meow"] (engine/run "testing new things")))))
+  (let [game {}
+        message "look a new message"
+        run-args {:game game
+                  :message message}]
+    (testing "A message with a command in it returns a response string"
+      (is (= "Meow" (:response (engine/run run-args)))))))

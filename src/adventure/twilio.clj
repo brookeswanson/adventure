@@ -12,7 +12,7 @@
 
 (defn respond
   "Given an array of strings return a TwiML xml response."
-  [str-messages]
+  [& str-messages]
   (let [messages (mapv str-message->sms str-messages)
         twiml-builder (reduce
                        (fn [r m]

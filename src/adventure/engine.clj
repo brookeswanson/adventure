@@ -21,9 +21,10 @@
     :unrecognized-command))
 
 (defn- words->command-map
-  [[maybe-command & extras]]
+  [[maybe-command & extras] game]
   {:command (word->command maybe-command)
-   :extras extras})
+   :extras extras
+   :game game})
 
 (defn- message->words
   "Given a message split on whitespace, filter out uninteresting words"
@@ -33,10 +34,11 @@
       (string/split #"\W+")
       ((partial filterv interesting-word?))))
 
-(defn run [message]
+(defn run [{:keys [game message]}]
   (if (string/blank? message)
-    [(:help error/message)]
+    {:game game
+     :response (:help error/message)}
     (-> message
         message->words
-        words->command-map
-        ((constantly ["Meow"])))))
+        (words->command-map game)
+        ((constantly {:game game :response "Meow"})))))
