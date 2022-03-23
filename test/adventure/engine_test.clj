@@ -3,7 +3,8 @@
    [clojure.string :as string]
    [clojure.test :refer [deftest testing is]]
    [adventure.engine :as engine]
-   [adventure.error :as error]))
+   [adventure.error :as error]
+   [adventure.game :as core.game]))
 
 (deftest interesting-word?-test
   (testing "It filters out empty words"
@@ -53,4 +54,5 @@
         run-args {:game game
                   :message message}]
     (testing "A message with a command in it returns a response string"
-      (is (= "Meow" (:response (engine/run run-args)))))))
+      (is (= (core.game/respond {:command "look"})
+             (:response (engine/run run-args)))))))

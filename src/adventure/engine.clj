@@ -1,7 +1,8 @@
 (ns adventure.engine
   (:require
-   [clojure.string :as string]
-   [adventure.error :as error]))
+   [adventure.error :as error]
+   [adventure.game :as core.game]
+   [clojure.string :as string]))
 
 (def ignore-list #{"to" "a" "the" "of" "an" "at"})
 
@@ -40,4 +41,4 @@
     (-> message
         message->words
         (words->command-map game)
-        ((constantly (assoc game :response "Meow"))))))
+        (core.game/generate-response))))
