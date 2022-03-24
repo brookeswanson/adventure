@@ -1,8 +1,15 @@
-(ns adventure.game)
+(ns adventure.game.core
+  (:require
+   [adventure.game.message :as game.message]))
 
 (def default-game {})
 
 (defmulti respond :command)
+
+(defmethod respond :new-game
+  new-game-response
+  [_]
+  (:new-game game.message/common))
 
 (defmethod respond "look"
   look-response
@@ -12,7 +19,7 @@
 (defmethod respond :default
   default-response
   [_]
-  "NOT THE DROIDS YOU'RE LOOKING FOR")
+  (:error game.message/common))
 
 (defn generate-response
   [{:keys [game]

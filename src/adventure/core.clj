@@ -13,10 +13,9 @@
   "Given a map with From and Body keys attempt to find the relevant
   game, pass it through the engine and then save the updated game and
   return the string responses."
-  [{player-id :From body :Body}]
+  [{player-id :From message :Body}]
   (let [game (db/get-game db/ds player-id)
-        result (engine/run {:game game
-                            :message body})]
+        result (engine/run game message)]
     ;; save game
     (db/upsert! db/ds player-id result)
     ;; return string responses
