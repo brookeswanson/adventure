@@ -11,6 +11,11 @@
   [_]
   (:new-game game.message/common))
 
+(defmethod respond "help"
+  help-response
+  [_]
+  (:help game.message/common))
+
 (defmethod respond "look"
   look-response
   [_]
