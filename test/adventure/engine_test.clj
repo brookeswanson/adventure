@@ -22,14 +22,14 @@
            (#'engine/word->command "see")
            (#'engine/word->command "look"))))
   (testing "An unrecognized command results in an error identifier"
-    (is (= :unrecognized-command (#'engine/word->command "meow")))))
+    (is (= :unrecognized-command (#'engine/word->command "asldkfjlsdkfjsadf")))))
 
 (deftest word->command-map-test
   (testing "The first word is translated into a command key"
     (is (= "look"
            (:command (#'engine/words->command-map ["see"] game))))
     (is (= :unrecognized-command
-           (:command (#'engine/words->command-map ["meow"] game)))))
+           (:command (#'engine/words->command-map ["asldkfjlsdkfjsadf"] game)))))
 
   (testing "The rest of the array gets put into the extras key"
     (is (= ["testing"]
