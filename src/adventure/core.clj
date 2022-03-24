@@ -30,7 +30,7 @@
         (response/content-type "application/xml"))
     {:status 400
      :headers {"content-type" "application/json"}
-     :error "Bad Request"}))
+     :body {:error "Bad Request"}}))
 
 (defroutes app-routes
   (GET "/" request "<h1>Meow</h1>")

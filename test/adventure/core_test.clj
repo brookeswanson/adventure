@@ -7,13 +7,13 @@
    [clojure.test :refer [deftest testing is]]))
 
 (def fake-db
-  (atom {:meow
+  (atom {"meow"
          {:game
           {}}}))
 
 (def sms-request
   {:params {:Body "for the purpose of testing"
-            :From :meow}})
+            :From "meow"}})
 
 (deftest run-game-test
   (with-redefs [db/ds fake-db
@@ -24,14 +24,14 @@
     (testing "That the game is run"
       (is (= (:response
               (engine/run
-                (get-in @fake-db [:meow :game])
+                (get-in @fake-db ["meow" :game])
                 (get-in sms-request [:params :Body])))
              (core/run-game (:params sms-request)))))
     (testing "That the db is updated"
-      (is (not (nil? (get-in @fake-db [:meow :game :response])))))))
+      (is (not (nil? (get-in @fake-db ["meow" :game :response])))))))
 
 (deftest sms-handler-test
-  (let [{:keys [status body]} (core/sms-handler sms-request)]
+  (let [{:keys [status body]} (core/sms-handler {})]
     (testing "Given a empty request object return a 200"
       (is (= 400 status)))
     (testing "Given a empty request object return a meow"
