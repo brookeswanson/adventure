@@ -16,8 +16,8 @@
   [{:keys [game]}]
   (game.message/display-items (:items game)))
 
-;; NOTE: help is a protected twilio word so `gethelp` serves as our help
-(defmethod respond "gethelp"
+;; NOTE: help is a protected twilio word so `guide` serves as our help
+(defmethod respond "guide"
   help-response
   [_]
   (:help game.message/common))

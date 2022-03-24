@@ -1,24 +1,33 @@
-(ns adventure.game.message)
+(ns adventure.game.message
+  (:require [clojure.string :as string]))
+
+(defn join
+  [messages]
+  (string/join "\n" messages))
 
 (def common
   {:help
-   (str
-    "To talk to someone in the room say 'talk to <person>'."
-    "\nTo check your inventory say inventory."
-    "\nTo move to a new room say 'go to <location>"
-    "\nTo restart type restart"
-    "\nTo see this message again say `gethelp`.")
+   (join
+    ["To talk to someone in the room say 'talk to <person>'."
+     "To check your inventory say 'inventory'."
+     "To move to a new room say 'go to <location>"
+     "To restart type 'restart'"
+     "To see this message again say 'guide'."])
    :error
-   (str 
-    "I'm not sure what to do with that. Try using short <action> <noun> commands"
-    "\nlike 'pick up the torch' or 'look around the room'.")
+   (join
+    ["😔 Apologies! I'm not sure what to do with that!"
+     "\nTry using short <action> <noun> commands"
+     "like:"
+     "'pick up the torch'"
+     "or"
+     "'look around the room'"])
    :new-game
-   (str
-    "👋 Welcome to Text Based Adventures!"
-    "\nWe wish you happy trails and good luck as you embark on this epic quest 🎉."
-    "\nResponses in this game generally take on the form of <action> <object>."
-    "\nFor example: Pick up the torch or look around the room."
-    "\nIf you need more information say `gethelp`.")})
+   (join
+    ["👋 Welcome to Text Based Adventures!"
+     "We wish you happy trails and good luck as you embark on this epic quest 🎉."
+     "\nResponses in this game generally take on the form of <action> <object>."
+     "For example: Pick up the torch or look around the room."
+     "If you need more information say 'guide'."])})
 
 (defn display-items
   [items]
