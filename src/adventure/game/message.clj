@@ -19,3 +19,10 @@
     "\nResponses in this game generally take on the form of <action> <object>."
     "\nFor example: Pick up the torch or look around the room."
     "\nIf you need more information type help.")})
+
+(defn display-items
+  [items]
+  (let [item-count (count items)]
+    (case item-count
+      0 "You don't have anything in your bag"
+      "You have some items")))

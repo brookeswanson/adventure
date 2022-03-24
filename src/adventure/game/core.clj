@@ -11,10 +11,20 @@
   [_]
   (:new-game game.message/common))
 
+(defmethod respond "inventory"
+  inventory-response
+  [{:keys [game]}]
+  (game.message/display-items (:items game)))
+
 (defmethod respond "help"
   help-response
   [_]
   (:help game.message/common))
+
+(defmethod respond "meow"
+  meow-response
+  [_]
+  "🐱")
 
 (defmethod respond "look"
   look-response
