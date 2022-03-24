@@ -19,7 +19,7 @@
   (case maybe-command
     ("look" "see" "check") "look"
     ("take" "grab" "find" "search" "pick") "take"
-    ("info", "inventory", "go", "meow") maybe-command
+    ("gethelp", "inventory", "go", "meow") maybe-command
     :unrecognized-command))
 
 (defn- words->command-map
