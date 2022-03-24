@@ -3,7 +3,10 @@
    [clojure.string :as string]
    [clojure.test :refer [deftest testing is]]
    [adventure.engine :as engine]
-   [adventure.error :as error]))
+   [adventure.game.message :as game.message]
+   [adventure.game.core :as game.core]))
+
+(def game {:current-location "meow"})
 
 (deftest interesting-word?-test
   (testing "It filters out empty words"
@@ -19,19 +22,25 @@
            (#'engine/word->command "see")
            (#'engine/word->command "look"))))
   (testing "An unrecognized command results in an error identifier"
-    (is (= :unrecognized-command (#'engine/word->command "meow")))))
+    (is (= :unrecognized-command (#'engine/word->command "asldkfjlsdkfjsadf")))))
 
 (deftest word->command-map-test
   (testing "The first word is translated into a command key"
     (is (= "look"
-           (:command (#'engine/words->command-map ["see"]))))
+           (:command (#'engine/words->command-map ["see"] game))))
     (is (= :unrecognized-command
-           (:command (#'engine/words->command-map ["meow"])))))
+           (:command (#'engine/words->command-map ["asldkfjlsdkfjsadf"] game)))))
 
   (testing "The rest of the array gets put into the extras key"
     (is (= ["testing"]
-           (:extras (#'engine/words->command-map ["hello" "testing"]))))
-    (is (nil? (:extras (#'engine/words->command-map ["meow"]))))))
+           (:extras (#'engine/words->command-map ["hello" "testing"] game))))
+    (is (nil? (:extras (#'engine/words->command-map ["meow"] game)))))
+
+  (testing "an empty game results in a new-game command"
+    (is (= :new-game
+           (:command (#'engine/words->command-map ["hello" "testing"] {}))))
+    (is (= :new-game
+           (:command (#'engine/words->command-map ["meow"] nil))))))
 
 (deftest message->words-test
   (testing "A single not ignored word returns an array with itself"
@@ -45,8 +54,10 @@
 
 (deftest run-test
   (testing "An empty message returns the help error message."
-    (is (= [(:help error/message)] (engine/run nil)))
-    (is (= [(:help error/message)] (engine/run ""))))
+    (is (= (:error game.message/common) (:response (engine/run game nil))))
+    (is (= (:error game.message/common) (:response (engine/run game "")))))
 
-  (testing "A message with a command in it returns a response string"
-    (is (= ["Meow"] (engine/run "testing new things")))))
+  (let [message "look a new message"]
+    (testing "A message with a command in it returns a response string"
+      (is (= (game.core/respond {:command "look"})
+             (:response (engine/run game message)))))))

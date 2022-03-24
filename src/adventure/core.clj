@@ -1,20 +1,34 @@
 (ns adventure.core
   (:require
+   [adventure.db.game :as db]
    [adventure.engine :as engine]
    [adventure.twilio :as twilio]
+   [clojure.string :as string]
    [compojure.core :refer [GET POST defroutes]]
    [compojure.route :as route]
+   [ring.util.response :as response]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults api-defaults]]))
 
 (defn run-game
-  [{:keys [From Body]}]
-  (engine/run Body))
+  "Given a map with From and Body keys attempt to find the relevant
+  game, pass it through the engine and then save the updated game and
+  return the string responses."
+  [{player-id :From message :Body}]
+  (let [game (db/get-game db/ds player-id)
+        result (engine/run game message)]
+    ;; save game
+    (db/upsert! db/ds player-id result)
+    ;; return string responses
+    (:response result)))
 
 (defn sms-handler
   [{:keys [params]}]
-  {:status 200
-   :body (twilio/respond (run-game params))
-   :headers {"Content-Type" "application/xml"}})
+  (if-not (:From params)
+    (-> (run-game params)
+        twilio/respond
+        response/response
+        (response/content-type "application/xml"))
+    (response/bad-request {:error "Bad Request"})))
 
 (defroutes app-routes
   (GET "/" request "<h1>Meow</h1>")
