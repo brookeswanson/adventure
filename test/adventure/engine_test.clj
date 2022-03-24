@@ -59,5 +59,5 @@
 
   (let [message "look a new message"]
     (testing "A message with a command in it returns a response string"
-      (is (= (game.core/respond {:command "look"})
+      (is (= (:response (game.core/respond {:command "look"}))
              (:response (engine/run game message)))))))

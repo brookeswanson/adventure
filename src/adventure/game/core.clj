@@ -4,42 +4,47 @@
 
 (def default-game {})
 
+(defn add-response
+  [game response]
+  (assoc game :response response))
+
 (defmulti respond :command)
 
 (defmethod respond :new-game
   new-game-response
   [_]
-  (:new-game game.message/common))
+  (add-response default-game (:new-game game.message/common)))
 
 (defmethod respond "inventory"
   inventory-response
   [{:keys [game]}]
-  (game.message/display-items (:items game)))
+  (->> (:items game)
+       (game.message/display-items)
+       (add-response game)))
 
 ;; NOTE: help is a protected twilio word so `guide` serves as our help
 (defmethod respond "guide"
   help-response
-  [_]
-  (:help game.message/common))
+  [{:keys [game]}]
+  (add-response game (:help game.message/common)))
 
 (defmethod respond "meow"
   meow-response
-  [_]
-  "🐱")
+  [{:keys [game]}]
+  (add-response game "🐱"))
 
 (defmethod respond "look"
   look-response
-  [_]
-  "You look around the room")
+  [{:keys [game]}]
+  (add-response game "You look around the room"))
 
 (defmethod respond :default
   default-response
-  [_]
-  (:error game.message/common))
+  [{:keys [game]}]
+  (add-response game (:error game.message/common)))
 
 (defn generate-response
-  [{:keys [game]
+  [{game :game
     :as cmd-map}]
-  (let [response (respond cmd-map)]
-    (assoc (or game default-game)
-           :response response)))
+  (respond
+   (assoc cmd-map :game (or game default-game))))
