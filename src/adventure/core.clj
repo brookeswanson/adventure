@@ -23,12 +23,14 @@
 
 (defn sms-handler
   [{:keys [params]}]
-  (if-not (:From params)
+  (if-not (string/blank? (:From params))
     (-> (run-game params)
         twilio/respond
         response/response
         (response/content-type "application/xml"))
-    (response/bad-request {:error "Bad Request"})))
+    {:status 400
+     :headers {"content-type" "application/json"}
+     :error "Bad Request"}))
 
 (defroutes app-routes
   (GET "/" request "<h1>Meow</h1>")
