@@ -1,8 +1,10 @@
 (ns adventure.game.core
   (:require
-   [adventure.game.message :as game.message]))
+   [adventure.game.message :as game.message]
+   [adventure.game.story :as game.story]))
 
-(def default-game {})
+(def default-game {:current-location :start-room
+                   :story game.story/default})
 
 (defn add-response
   [game response]
@@ -13,7 +15,11 @@
 (defmethod respond :new-game
   new-game-response
   [_]
-  (add-response default-game (:new-game game.message/common)))
+  (let [message (game.message/join
+                 [(:new-game game.message/common)
+                  "\n"
+                  (game.story/describe-room default-game)])]
+    (add-response default-game message)))
 
 (defmethod respond "inventory"
   inventory-response
@@ -35,8 +41,9 @@
 
 (defmethod respond "look"
   look-response
-  [{:keys [game]}]
-  (add-response game "You look around the room"))
+  [{:keys [game]
+    :as cmd-map}]
+  (add-response game (game.story/get-result cmd-map)))
 
 (defmethod respond :default
   default-response

@@ -17,7 +17,7 @@
   "Maps command words to a single common action."
   [maybe-command]
   (case maybe-command
-    ("look" "see" "check") "look"
+    ("look" "see" "check" "examine") "look"
     ("take" "grab" "find" "search" "pick") "take"
     ("guide" "inventory" "go" "meow") maybe-command
     "restart" :new-game
@@ -30,7 +30,7 @@
   [[maybe-command & extras] game]
   (if (seq game)
     {:command (word->command maybe-command)
-     :extras extras
+     :object (last extras)
      :game game}
     {:command :new-game}))
 
