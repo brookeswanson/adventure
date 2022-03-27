@@ -39,6 +39,18 @@
   [{:keys [game]}]
   (add-response game "🐱"))
 
+(defmethod respond "take"
+  take-resonse
+  [{:keys [game]
+    :as cmd-map}]
+  ((game.story/get-result cmd-map) game))
+
+(defmethod respond "use"
+  take-resonse
+  [{:keys [game]
+    :as cmd-map}]
+  ((game.story/get-result cmd-map) game))
+
 (defmethod respond "look"
   look-response
   [{:keys [game]
