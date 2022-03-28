@@ -31,7 +31,10 @@
 
 (defn display-items
   [items]
-  (case (count items)
-    0 "You don't have anything in your bag"
-    (join ["You have:"
-           (string/join "\n- " (mapv val items))])))
+  (let [only-active (filterv val items)]
+    (case (count only-active)
+      0 "You don't have anything in your bag"
+      (string/join "\n- "
+                   (into ["You have:"]
+                         (map val)
+                         only-active)))))

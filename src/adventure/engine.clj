@@ -4,6 +4,8 @@
    [adventure.game.core :as game.core]
    [clojure.string :as string]))
 
+(def interactive-commands #{:go :look :take :use})
+
 (def ignore-list #{"to" "a" "the" "of" "an" "at"})
 
 (defn- interesting-word?
@@ -23,16 +25,26 @@
     "restart" :new-game
     :unrecognized-command))
 
+(defn- command->interaction
+  "Given a command either return itself or if it's one of a set"
+  [command]
+  (if (interactive-commands command)
+    :interact
+    command))
+
 (defn- words->command-map
   "Given a vector of a potential command, followed by other potentially
   interesting words, and a game return a command map. If there is no
   game instead return new game."
   [[maybe-command & extras] game]
   (if (seq game)
-    {:command (word->command maybe-command)
-     :object (-> extras last keyword)
-     :game game}
-    {:command :new-game}))
+    (let [command (word->command maybe-command)]
+      {:interaction (command->interaction command)
+       :command command
+       :object (-> extras last keyword)
+       :game game})
+    {:interaction :new-game}))
+
 
 (defn- message->words
   "Given a string split on whitespace, filter out uninteresting

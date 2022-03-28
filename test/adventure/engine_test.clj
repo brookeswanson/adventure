@@ -38,9 +38,9 @@
 
   (testing "an empty game results in a new-game command"
     (is (= :new-game
-           (:command (#'engine/words->command-map ["hello" "testing"] {}))))
+           (:interaction (#'engine/words->command-map ["hello" "testing"] {}))))
     (is (= :new-game
-           (:command (#'engine/words->command-map ["meow"] nil))))))
+           (:interaction (#'engine/words->command-map ["meow"] nil))))))
 
 (deftest message->words-test
   (testing "A single not ignored word returns an array with itself"
