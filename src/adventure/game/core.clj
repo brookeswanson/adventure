@@ -55,6 +55,14 @@
        game.story/get-result
        (game.story/deep-merge game)))
 
+(defmethod respond :go
+  take-resonse
+  [{:keys [game]
+    :as cmd-map}]
+  (->> cmd-map
+       game.story/get-result
+       (game.story/deep-merge game)))
+
 (defmethod respond :look
   look-response
   [{:keys [game]
@@ -71,4 +79,5 @@
     :as cmd-map}]
   (let [new-game (respond (assoc cmd-map :game (or game default-game)))]
     (cond-> new-game
-      (:new-room new-game) game.story/describe-room)))
+      (:new-room new-game) game.story/describe-room
+      (not (seq new-game)) (add-response default-game "something went a little sideways"))))

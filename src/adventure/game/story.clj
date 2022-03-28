@@ -18,7 +18,11 @@
              room-interactions))
 
 (def default
-  {:map
+  {:default {:use {:response "You can't use that here"}
+             :take {:resonse "Not sure what do do with that, try looking around to see what's here."}
+             :go {:response "You have nowhere to go"}
+             :look "You seem to have temporarily lost your sense of sight."}
+   :map
    {:hallway1
     {:initial
      "You can barely see anything, it's dark in here. You probably need something to look around with."
@@ -28,7 +32,13 @@
                                "A monsterous figure that stands 6 feet tall."
                                "At the base of the statue is a metal plate that reads:"
                                "\n\n'He Who Lurks'"])}
-                    :default {:look "It's too dark to see anything, you probably need a source of light."}
+                    :back {:go {:response "You return to the small room"
+                                :current-location :start-room
+                                :previous-location :hallway1}}
+                    :default {:look "It's too dark to see anything, you probably need a source of light."
+                              :go {:response "You return to the small room"
+                                   :current-location :start-room
+                                   :previous-location :hallway1}}
                     :walls {:look
                             (message/join ["On the left side of the hallway is a large worn down tapestry,"
                                            " on the right is a strange looking statue."
@@ -46,7 +56,15 @@
                             {:key {:take nil
                                    :use
                                    (make-mergeable-map
-                                    {:start-room {:key {:use nil}}}
+                                    {:start-room {:key {:use nil}
+                                                  :default
+                                                  {:go {:current-location :hallway1
+                                                        :previous-location :start-room
+                                                        :response "You walk through the doorway into the hallway"}}
+                                                  :use {:use
+                                                        {:current-location :hallway1
+                                                         :previous-location :start-room
+                                                         :response "You walk through the doorway into the hallway"}}}}
                                     {:current-location :hallway1
                                      :new-room true
                                      :inventory {:key nil}
@@ -107,4 +125,5 @@
            object]}]
   (let [current-location (keyword (:current-location game))]
     (or (get-in game [:story :map current-location :interactions object command])
-        (get-in game [:story :map current-location :interactions :default command]) )))
+        (get-in game [:story :map current-location :interactions :default command])
+        (get-in game [:story :default command]))))
