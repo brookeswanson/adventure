@@ -1,6 +1,6 @@
 # A Text Based Adventure Engine
 
-This idea was originated in a hackathon - the concept was a silly take on text based adventures where the fun bit was literally using sms. The goal here is to parse a twilio message body, updating game state for the given number, and responding to the requested action. The engine will rely on a structured story map with actions like use and take relying on deep merging map values. A thing I'd like to eventually make is a way to generate a game using via a site.
+This idea was originated in a hackathon - the concept was a silly take on text based adventures where the fun bit was literally using sms. The goal here is to parse a twilio message body, updating game state for the given number, and responding to the requested action. The engine will rely on a structured story map with actions like use and take relying on deep merging map values. A thing I'd like to eventually make is a way to generate a game using a website.
 
 This app is auto deployed using heroku and using github to run tests. In order to set this up you need to:
 
@@ -14,7 +14,7 @@ This app is auto deployed using heroku and using github to run tests. In order t
 
 https://adventures-in-texting.herokuapp.com/
 
-Interact by texting [(608)-471-6866](sms:+16084716866)
+Interact by texting [(608)-471-6866](sms:16084716866)
 
 ## Endpoints
 
@@ -23,14 +23,14 @@ Interact by texting [(608)-471-6866](sms:+16084716866)
 
 ## Namespaces
 
-* core - main app entrypoint, where the service lives
-* engine - parses out a request string into a command map the game can work with
-* twilio - generates a TwiML payload from a response string
-* db.migrations - runs migrations on startup
-* db.game - handles upsert, delete, and getting game instances
-* game.core - dispatches on command value and returns an updated game with a response
-* game.message - holds default messages for error states etc
-* game.story - contains the default game map as well as helper functions to deal with handling game state
+* `core` - main app entrypoint, where the service lives
+* `engine` - parses out a request string into a command map the game can work with
+* `twilio` - generates a TwiML payload from a response string
+* `db.migrations` - runs migrations on startup
+* `db.game` - handles upsert, delete, and getting game instances
+* `game.core` - dispatches on command value and returns an updated game with a response
+* `game.message` - holds default messages for error states etc
+* `game.story` - contains the default game map as well as helper functions to deal with handling game state
 
 ## Key Concepts
 
