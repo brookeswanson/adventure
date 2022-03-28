@@ -78,6 +78,7 @@
   [{game :game
     :as cmd-map}]
   (let [new-game (respond (assoc cmd-map :game (or game default-game)))]
-    (cond-> new-game
-      (:new-room new-game) game.story/describe-room
-      (not (seq new-game)) (add-response default-game "something went a little sideways"))))
+    (if (seq new-game)
+      (cond-> new-game
+        (:new-room new-game) game.story/describe-room)
+      (add-response default-game "something went a little sideways"))))
