@@ -10,7 +10,6 @@
     (apply merge-with deep-merge vals)
     (last vals)))
 
-
 (defn make-mergeable-map
   [room-interactions base-map]
   (reduce-kv (fn [m k v]
