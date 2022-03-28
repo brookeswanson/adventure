@@ -4,22 +4,23 @@
    [adventure.game.story :as game.story]))
 
 (def default-game {:current-location :start-room
+                   :new-room true
                    :story game.story/default})
 
 (defn add-response
+  "Given a game and a message response assoc that response onto the game."
   [game response]
   (assoc game :response response))
 
-(defmulti respond :command)
+(defmulti respond
+  "Expects a command map, with command, object, and game keys and
+  returns a game with a response."
+  :command)
 
 (defmethod respond :new-game
   new-game-response
   [_]
-  (let [message (game.message/join
-                 [(:new-game game.message/common)
-                  "\n"
-                  (game.story/describe-room default-game)])]
-    (add-response default-game message)))
+  (add-response default-game (:new-game game.message/common)))
 
 (defmethod respond "inventory"
   inventory-response
@@ -43,13 +44,16 @@
   take-resonse
   [{:keys [game]
     :as cmd-map}]
-  ((game.story/get-result cmd-map) game))
+  (let [result (game.story/get-result cmd-map)]
+    (game.story/deep-merge game result)))
 
 (defmethod respond "use"
   take-resonse
   [{:keys [game]
     :as cmd-map}]
-  ((game.story/get-result cmd-map) game))
+  (->> cmd-map
+       game.story/get-result
+       (game.story/deep-merge game)))
 
 (defmethod respond "look"
   look-response
@@ -65,5 +69,6 @@
 (defn generate-response
   [{game :game
     :as cmd-map}]
-  (respond
-   (assoc cmd-map :game (or game default-game))))
+  (let [new-game (respond (assoc cmd-map :game (or game default-game)))]
+    (cond-> new-game
+      (:new-room new-game) game.story/describe-room)))

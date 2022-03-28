@@ -3,26 +3,38 @@
    [cheshire.core :as json]
    [adventure.game.message :as message]))
 
-(defn make-take-fn
-  [{:keys [fn-name
-           room-key
-           message
-           item-name
-           change-game-fn
-           item-map
-           use-fn]}]
-  (let [item-path [:story :map room-key :interactions item-name]]
-    (fn [game]
-      (-> game
-          (assoc :response message)
-          (update-in item-path dissoc "take") ;; remove from environment
-          (assoc-in (conj item-path "use") use-fn) ;; say what happens when its used
-          (change-game-fn)
-          (update :inventory conj item-map)))))
+(defn deep-merge
+  "Recursively merges maps. If vals are not maps, the last value wins."
+  [& vals]
+  (if (every? map? vals)
+    (apply merge-with deep-merge vals)
+    (last vals)))
+
+
+(defn make-mergeable-map
+  [room-interactions base-map]
+  (reduce-kv (fn [m k v]
+               (assoc-in m [:story :map k :interactions] v))
+             base-map
+             room-interactions))
 
 (def default
   {:map
-   {:start-room
+   {:hallway1
+    {:initial
+     "You can barely see anything, it's dark in here. You probably need something to look around with."
+     :interactions {"statue" {"look"
+                              (message/join
+                               ["You see in front of you an ominous looking marble statue."
+                                "A monsterous figure that stands 6 feet tall."
+                                "At the base of the statue is a metal plate that reads:"
+                                "\n\n'He Who Lurks'"])}
+                    :default {"look" "It's too dark to see anything, you probably need a source of light."}
+                    "walls" {"look"
+                             (message/join ["On the left side of the hallway is a large worn down tapestry,"
+                                            " on the right is a strange looking statue."
+                                            " There appears to be writing below"])}}}
+    :start-room
     {:initial (message/join
                ["You find yourself sitting on a bed 🛏️  in a dimly lit room."
                 "The air is damp and the decoration is sparse."
@@ -30,37 +42,30 @@
                 "\nYou see a door 🚪 to your left with a complex looking lock."])
      :interactions {"key" {"look" "a small brass key"
                            "take"
-                           (make-take-fn
-                            {:room-key :start-room
-                             :message "you pick up the key and put it in your bag"
-                             :item-name "key"
-                             :change-game-fn
-                             (fn [game]
-                               (assoc-in game
-                                         [:story :map :start-game :interactions "table"]
-                                         "The table is dusty except for an outline of a key 🗝️"))
-                             :item-map
-                             {:description "a small brass key"
-                              :map-id "key"
-                              :id "key1"}
-                             :use-fn
-                             (fn [game]
-                               (-> game
-                                   (assoc :current-location :hallway1
-                                          :respone (message/join
-                                                    ["After jiggling the key in the lock you finally here a click."
-                                                     "The door swings forward revealing a dark hallway."
-                                                     "cautiously you take a step into the hallway"]))))})}
+                           (make-mergeable-map
+                            {:start-room
+                             {"key" {"take" nil
+                                     "use"
+                                     (make-mergeable-map
+                                      {:start-room {"key" {"use" nil}}}
+                                      {:current-location :hallway1
+                                       :new-room true
+                                       :inventory {"key" nil}
+                                       :previous-location :start-room
+                                       :response (message/join
+                                                  ["After jiggling the key in the lock you finally here a click."
+                                                   "The door swings forward revealing a dark hallway."
+                                                   "cautiously you take a step into the hallway."
+                                                   "\n\nYou hear a small =woosh=, and the key dissapears"])})}
+                              "table" {"look" "The table is dusty except for an outline of a key 🗝️"}}}
+                            {:inventory {"key" "a small brass key"}
+                             :response "you pick up the key and put it in your bag"})}
                     :default {"look"
                               (str
                                "You see a small table, mounted torch, door, and bed that's recently been slept in."
                                " It smells a little damp in here.")
                               "take"
-                              (fn [game]
-                                (assoc game
-                                       :response
-                                       (str "What you're trying to grab doesn't exist here."
-                                            " Check your inventory or look around.")))}
+                              {:response "That doesn't exist here try to 'look around'"}}
                     "table" {"look" "A dusty scratched up table with a small brass key on it."}
                     "around" {"look"
                               (str
@@ -70,20 +75,32 @@
                                                  " Someone clearly slept here recently."])}
                     "torch" {"look" "What looked normal on first glance now appears to be somewhat magical."
                              "take"
-                             (make-take-fn {:room-key :start-room
-                                            :message "you pick up the torch and hold it in front of you"
-                                            :item-name "torch"
-                                            :change-game-fn identity
-                                            :item-map
-                                            {:description "a small torch eminating a soft magical light."
-                                             :map-id "torch"
-                                             :id "torch1"}
-                                            :use-fn #(assoc % :response "The room shines a little brighter.")})}
+                             (make-mergeable-map
+                              {:start-room {"torch" {"take" nil
+                                                     "use" {:response "The room shines a little brighter"}}}
+                               :hallway1 {"torch" {"use" "The room glows a little brighter"}
+                                          :default
+                                          {"look" "You see a tapestry on the left wall and a statue on the right."}}}
+                              {:inventory {"torch" "a small torch eminating a magical light"}
+                               :response "The room glows a little brighter as you pick up the torch"
+                               :story
+                               {:map
+                                {:hallway1
+                                 {:initial
+                                  (message/join
+                                   ["The torch illuminates a long stone hallway."
+                                    " on the left you see a ratty tapestry, "
+                                    " on the right you see a marble statue."
+                                    " At first glance it appears that there's no exit"])}}}})}
                     "door" {"look" "There's a big brass lock with an interesting emblem. You don't recognize it."}}}}})
 
 (defn describe-room
-  [{:keys [current-location story]}]
-  (get-in story [:map current-location :initial]))
+  [{:keys [current-location response story]
+    :as game}]
+  (let [description (get-in story [:map current-location :initial])]
+    (assoc game
+           :response (message/join [response description])
+           :new-room false)))
 
 (defn get-result
   [{:keys [command
