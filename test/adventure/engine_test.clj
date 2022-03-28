@@ -32,9 +32,9 @@
            (:command (#'engine/words->command-map ["asldkfjlsdkfjsadf"] game)))))
 
   (testing "The rest of the array gets put into the extras key"
-    (is (= ["testing"]
-           (:extras (#'engine/words->command-map ["hello" "testing"] game))))
-    (is (nil? (:extras (#'engine/words->command-map ["meow"] game)))))
+    (is (= "testing"
+           (:object (#'engine/words->command-map ["hello" "testing"] game))))
+    (is (nil? (:object (#'engine/words->command-map ["meow"] game)))))
 
   (testing "an empty game results in a new-game command"
     (is (= :new-game

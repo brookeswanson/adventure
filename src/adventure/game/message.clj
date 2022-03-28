@@ -31,7 +31,7 @@
 
 (defn display-items
   [items]
-  (let [item-count (count items)]
-    (case item-count
-      0 "You don't have anything in your bag"
-      "You have some items")))
+  (case (count items)
+    0 "You don't have anything in your bag"
+    (join ["You have:"
+           (string/join "\n- " (mapv val items))])))

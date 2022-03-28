@@ -1,14 +1,21 @@
 (ns adventure.game.core
   (:require
-   [adventure.game.message :as game.message]))
+   [adventure.game.message :as game.message]
+   [adventure.game.story :as game.story]))
 
-(def default-game {})
+(def default-game {:current-location :start-room
+                   :new-room true
+                   :story game.story/default})
 
 (defn add-response
+  "Given a game and a message response assoc that response onto the game."
   [game response]
   (assoc game :response response))
 
-(defmulti respond :command)
+(defmulti respond
+  "Expects a command map, with command, object, and game keys and
+  returns a game with a response."
+  :command)
 
 (defmethod respond :new-game
   new-game-response
@@ -33,10 +40,26 @@
   [{:keys [game]}]
   (add-response game "🐱"))
 
+(defmethod respond "take"
+  take-resonse
+  [{:keys [game]
+    :as cmd-map}]
+  (let [result (game.story/get-result cmd-map)]
+    (game.story/deep-merge game result)))
+
+(defmethod respond "use"
+  take-resonse
+  [{:keys [game]
+    :as cmd-map}]
+  (->> cmd-map
+       game.story/get-result
+       (game.story/deep-merge game)))
+
 (defmethod respond "look"
   look-response
-  [{:keys [game]}]
-  (add-response game "You look around the room"))
+  [{:keys [game]
+    :as cmd-map}]
+  (add-response game (game.story/get-result cmd-map)))
 
 (defmethod respond :default
   default-response
@@ -46,5 +69,6 @@
 (defn generate-response
   [{game :game
     :as cmd-map}]
-  (respond
-   (assoc cmd-map :game (or game default-game))))
+  (let [new-game (respond (assoc cmd-map :game (or game default-game)))]
+    (cond-> new-game
+      (:new-room new-game) game.story/describe-room)))
