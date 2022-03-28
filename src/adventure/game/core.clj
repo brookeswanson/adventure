@@ -22,7 +22,7 @@
   [_]
   (add-response default-game (:new-game game.message/common)))
 
-(defmethod respond "inventory"
+(defmethod respond :inventory
   inventory-response
   [{:keys [game]}]
   (->> (:items game)
@@ -30,24 +30,24 @@
        (add-response game)))
 
 ;; NOTE: help is a protected twilio word so `guide` serves as our help
-(defmethod respond "guide"
+(defmethod respond :guide
   help-response
   [{:keys [game]}]
   (add-response game (:help game.message/common)))
 
-(defmethod respond "meow"
+(defmethod respond :meow
   meow-response
   [{:keys [game]}]
   (add-response game "🐱"))
 
-(defmethod respond "take"
+(defmethod respond :take
   take-resonse
   [{:keys [game]
     :as cmd-map}]
   (let [result (game.story/get-result cmd-map)]
     (game.story/deep-merge game result)))
 
-(defmethod respond "use"
+(defmethod respond :use
   take-resonse
   [{:keys [game]
     :as cmd-map}]
@@ -55,7 +55,7 @@
        game.story/get-result
        (game.story/deep-merge game)))
 
-(defmethod respond "look"
+(defmethod respond :look
   look-response
   [{:keys [game]
     :as cmd-map}]

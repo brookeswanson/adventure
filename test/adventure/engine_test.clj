@@ -18,7 +18,7 @@
 
 (deftest word->command-test
   (testing "Similar words result in the same command"
-    (is (= "look"
+    (is (= :look
            (#'engine/word->command "see")
            (#'engine/word->command "look"))))
   (testing "An unrecognized command results in an error identifier"
@@ -26,13 +26,13 @@
 
 (deftest word->command-map-test
   (testing "The first word is translated into a command key"
-    (is (= "look"
+    (is (= :look
            (:command (#'engine/words->command-map ["see"] game))))
     (is (= :unrecognized-command
            (:command (#'engine/words->command-map ["asldkfjlsdkfjsadf"] game)))))
 
   (testing "The rest of the array gets put into the extras key"
-    (is (= "testing"
+    (is (= :testing
            (:object (#'engine/words->command-map ["hello" "testing"] game))))
     (is (nil? (:object (#'engine/words->command-map ["meow"] game)))))
 
@@ -59,5 +59,5 @@
 
   (let [message "look a new message"]
     (testing "A message with a command in it returns a response string"
-      (is (= (:response (game.core/respond {:command "look"}))
+      (is (= (:response (game.core/respond {:command :look}))
              (:response (engine/run game message)))))))
