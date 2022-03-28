@@ -25,7 +25,7 @@
 (defmethod respond :inventory
   inventory-response
   [{:keys [game]}]
-  (->> (:items game)
+  (->> (:inventory game)
        (game.message/display-items)
        (add-response game)))
 
