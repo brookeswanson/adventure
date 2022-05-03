@@ -99,7 +99,9 @@
 
 (def hallway1
   {:initial
-   "You can barely see anything, it's dark in here. You probably need something to look around with."
+   (str
+    "You can barely see anything, it's dark in here."
+    " You probably need something to look around with.")
    :default
    {:look
     {:response
@@ -108,7 +110,11 @@
          :current-location :start-room
          :previous-location :hallway1}}
    :interactions
-   {:statue {:look
+   {:tapestry {:look
+               {:response
+                (message/join
+                 ["In front of you is "])}}
+    :statue {:look
              {:response
               (message/join
                ["You see in front of you an ominous looking marble statue."
@@ -130,7 +136,8 @@
     :take {:response
            "Not sure what do do with that, try looking around to see what's here."}
     :go   {:response "You have nowhere to go"}
-    :look {:response "You seem to have temporarily lost your sense of sight."}}
+    :look {:response "You seem to have temporarily lost your sense of sight."}
+    :touch {:response "You feel nothing - try touching something else."}}
    :map
    {:hallway1   hallway1
     :start-room start-room}})

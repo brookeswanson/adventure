@@ -4,7 +4,10 @@
    [adventure.game.core :as game.core]
    [clojure.string :as string]))
 
-(def interactive-commands #{:go :look :take :use})
+(def interactive-commands
+  (into #{}
+        (map key)
+        game.message/interactive-commands-map))
 
 (def ignore-list #{"to" "a" "the" "of" "an" "at"})
 
@@ -21,7 +24,8 @@
   (case maybe-command
     ("look" "see" "check" "examine") :look
     ("take" "grab" "find" "search" "pick") :take
-    ("use" "guide" "inventory" "go" "meow") (keyword maybe-command)
+    ("touch" "feel" "interact" "investigate") :touch
+    ("use" "guide" "inventory" "go" "list" "meow") (keyword maybe-command)
     "restart" :new-game
     :unrecognized-command))
 
